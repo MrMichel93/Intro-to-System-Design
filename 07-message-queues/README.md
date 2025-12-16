@@ -293,4 +293,4 @@ channel.start_consuming()
 
 ## Next Steps
 
-Complete the challenges, then learn about **[CDN (Content Delivery Networks)](../08-cdn/)** to understand how to deliver content faster globally!
+Complete the challenges, then learn about **[CDN](../08-cdn/)** to understand how to deliver content faster globally!

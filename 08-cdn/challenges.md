@@ -169,7 +169,7 @@ Cost = 10,000 GB × $0.08 = $800/month
 ```
 
 **Savings:** 70% reduction = 3TB served
-**New cost:** 3TB × $0.08/GB × 1000 = $240/month
+**New cost:** 3TB × 1000 GB/TB × $0.08/GB = $240/month
 **Savings:** $560/month
 
 **B. Increase Cache Hit Ratio:**

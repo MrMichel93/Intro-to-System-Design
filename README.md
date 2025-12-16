@@ -9,7 +9,7 @@ System design is the process of defining the architecture, components, modules, 
 ## 🎯 Who is This For?
 
 This course is designed for:
-- High school students (ages 16-20) with basic programming knowledge
+- Students aged 16-20 with basic programming knowledge
 - Anyone interested in understanding how large-scale applications work
 - Students preparing for technical interviews or computer science studies
 

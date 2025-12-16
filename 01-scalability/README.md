@@ -145,4 +145,4 @@ Break your application into smaller, independently scalable services.
 
 ## Next Steps
 
-Now that you understand scalability, complete the challenges to test your knowledge! Then, move on to **Load Balancing** to learn how to distribute traffic across multiple servers.
+Now that you understand scalability, complete the challenges to test your knowledge! Then, move on to **[Load Balancing](../02-load-balancing/)** to learn how to distribute traffic across multiple servers.
