@@ -45,7 +45,8 @@ Design a video streaming platform like YouTube or Netflix that allows users to u
 **Bandwidth & Storage:**
 - Average video size: 500 MB (1080p, 10 minutes)
 - Daily upload: 500K videos × 500 MB = 250 TB/day
-- Daily streaming: 5B views × 10 min × 5 Mbps = 37.5 PB/day
+- Daily streaming bandwidth: 5B views × 10 min × 5 Mbps = 3.75 PB transferred/day
+  - (5B × 10 × 60 sec × 5 Mbps ÷ 8 bits/byte = 3,750 TB = 3.75 PB)
 
 ## Capacity Estimation
 

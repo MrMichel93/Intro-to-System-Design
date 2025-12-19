@@ -114,10 +114,12 @@ Total: ~200 TB
 500M users × 20 orders avg × 2 KB = 20 TB (order history)
 Total: ~21 TB
 
-**Orders (per year):**
-10M orders/day × 365 days = 3.65B orders/year
-3.65B × 5 KB per order = 18.25 TB/year
-5-year storage: 91.25 TB
+**Orders (cumulative 5 years):**
+Year 1: 3.65B orders × 5 KB = 18.25 TB
+Year 2: 3.65B orders × 5 KB = 18.25 TB (+ Year 1)
+Year 3-5: Same pattern
+Total 5 years: 3.65B × 5 years = 18.25B orders × 5 KB = 91.25 TB
+(All orders retained for history, not replaced)
 
 **Reviews:**
 100M products × 50 reviews avg × 1 KB = 5 TB
