@@ -424,3 +424,44 @@ db.users.find().readPref('primary')
 ## Next Steps
 
 Continue to **[API Design](../10-api-design/)** to learn how to expose your consistent data through well-designed APIs!
+
+## Implementation Approaches
+
+### Approach 1: Strong Consistency
+- **Description**: All clients see same data at same time. Reads return most recent write.
+- **Pros**: Simple to reason about, no stale data, predictable behavior.
+- **Cons**: Higher latency, lower availability, coordination overhead.
+- **When to use**: Financial systems, inventory management, critical data accuracy.
+
+### Approach 2: Eventual Consistency
+- **Description**: Data will become consistent eventually, but may be temporarily inconsistent.
+- **Pros**: High availability, low latency, scales well.
+- **Cons**: Complex application logic, temporary inconsistencies, harder to debug.
+- **When to use**: Social media, DNS, caching, most web applications.
+
+### Approach 3: Causal Consistency
+- **Description**: Respects cause-and-effect relationships. Related operations appear in order.
+- **Pros**: More intuitive than eventual, less overhead than strong.
+- **Cons**: More complex to implement, requires tracking causality.
+- **When to use**: Collaborative editing, messaging, comment threads.
+
+## Trade-offs
+
+| Aspect | Strong | Eventual |
+|--------|--------|----------|
+| Consistency | Always current | Temporarily stale |
+| Availability | Lower | Higher |
+| Latency | Higher | Lower |
+| Partition Tolerance | Lower | Higher |
+| Complexity | Simple app logic | Complex app logic |
+
+## Interview Tips
+
+**CAP Theorem**: "Choose 2 of 3: Consistency, Availability, Partition Tolerance. Partitions are inevitable, so choose CP or AP."
+
+**Explain Patterns**: "Strong consistency for banking. Eventual for social media. Read-your-writes for user profiles."
+
+**Quorum Reads/Writes**: "W + R > N ensures strong consistency. W=2, R=2, N=3 for balance."
+
+**Real Examples**: "DynamoDB offers both strong and eventual reads. MongoDB has tunable consistency."
+

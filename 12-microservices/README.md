@@ -488,4 +488,110 @@ def get_user_recommendations(user_id):
 
 ## Next Steps
 
-Complete the challenges, then learn about **[Message Queues](../07-message-queues/)** - a key technology for microservices communication!
+Complete the challenges, then learn about **[Message Queues](../11-message-queues/)** - a key technology for microservices communication!
+
+## Implementation Approaches
+
+### Approach 1: Monolith First
+- **Description**: Start with monolith, extract microservices as needed.
+- **Pros**: Simpler initially, faster development, easier to refactor, lower ops overhead.
+- **Cons**: Technical debt if delayed too long, harder to extract later.
+- **When to use**: Startups, unclear requirements, small team, MVP development.
+
+### Approach 2: Microservices from Start
+- **Description**: Design microservices architecture from beginning.
+- **Pros**: Never need to refactor, clear boundaries, scales immediately.
+- **Cons**: Over-engineering, premature optimization, higher complexity, slower initial development.
+- **When to use**: Large teams, clear domain boundaries, proven product, enterprise.
+
+### Approach 3: Strangler Pattern
+- **Description**: Gradually replace monolith by adding microservices alongside.
+- **Pros**: Incremental migration, low risk, learn as you go, continuous delivery.
+- **Cons**: Temporary complexity, dual maintenance, longer migration.
+- **When to use**: Existing monolith, want to modernize gradually, risk-averse.
+
+### Approach 4: Service Mesh
+- **Description**: Infrastructure layer handling service-to-service communication.
+- **Pros**: Observability, security, traffic control, language-agnostic.
+- **Cons**: Operational complexity, resource overhead, learning curve.
+- **When to use**: Many microservices (20+), Kubernetes, need advanced traffic management.
+
+## Trade-offs
+
+| Aspect | Monolith | Microservices |
+|--------|----------|---------------|
+| Development Speed | Fast initially | Slower initially |
+| Deployment | Simple | Complex |
+| Scalability | Limited | Excellent |
+| Team Organization | Centralized | Distributed |
+| Technology Choice | Uniform | Polyglot possible |
+| Debugging | Easier | Harder |
+| Operational Overhead | Low | High |
+| Data Consistency | Easy | Challenging |
+
+## Capacity Calculations
+
+### Service Sizing Example
+```
+Total traffic: 10,000 RPS
+
+Service breakdown:
+- User service: 30% = 3,000 RPS
+- Product service: 40% = 4,000 RPS
+- Order service: 20% = 2,000 RPS
+- Payment service: 10% = 1,000 RPS
+
+Instance capacity: 100 RPS each
+
+Instances needed:
+- User: 30 (with 50% buffer: 45)
+- Product: 40 (with buffer: 60)
+- Order: 20 (with buffer: 30)
+- Payment: 10 (with buffer: 15)
+
+Total: 150 instances vs 100 in monolith
+Overhead: 50% more instances for resilience
+```
+
+## Common Patterns
+
+**API Gateway**: Single entry point for all clients. Handles routing, authentication, rate limiting.
+
+**Service Discovery**: Services register themselves. Others discover them dynamically. Enables dynamic scaling.
+
+**Circuit Breaker**: Stop calling failing services. Prevents cascade failures. Retry after timeout.
+
+**Saga Pattern**: Distributed transactions across services. Each service performs local transaction.
+
+**Event Sourcing**: Store events rather than current state. Enable replay and audit trail.
+
+**CQRS**: Separate read and write models. Optimize each independently.
+
+## Anti-Patterns
+
+**Distributed Monolith**: Microservices sharing database. Tight coupling defeats purpose.
+
+**Too Fine-Grained**: Service per function. Too much network overhead. Overly complex.
+
+**No API Gateway**: Clients call services directly. Versioning nightmare. Security issues.
+
+**Sync Communication Only**: REST calls everywhere. Failure propagation. Use async messaging.
+
+**Shared Database**: Services accessing same tables. No independence. Migration nightmare.
+
+## Interview Tips
+
+**When to Use**: "Microservices when you have multiple teams, clear domain boundaries, need independent scaling."
+
+**Monolith vs Microservices**: "Start with monolith unless you have very good reason. Extract services when boundaries clear."
+
+**Communication**: "Async messaging (Kafka, RabbitMQ) for events. REST/gRPC for synchronous calls. Choose based on needs."
+
+**Data Management**: "Each service owns its data. No shared databases. Accept eventual consistency."
+
+**Deployment**: "Container orchestration (Kubernetes) for managing many services. CI/CD pipeline critical."
+
+**Observability**: "Distributed tracing, centralized logging, metrics. Can't debug without them."
+
+**Real Examples**: "Netflix has 700+ microservices. Amazon has thousands. Uber migrated from monolith to microservices."
+

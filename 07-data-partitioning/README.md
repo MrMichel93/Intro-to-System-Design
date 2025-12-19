@@ -460,3 +460,18 @@ class ShardManager:
 ## Next Steps
 
 Continue to **[Replication](../08-replication/)** to learn how to create copies of your partitioned data for reliability!
+
+## Interview Tips
+
+**Explain Partitioning Purpose**: "Splits large datasets across multiple databases for horizontal scalability."
+
+**Partition Key Selection**: "Choose keys that distribute data evenly. User ID works well as users are evenly distributed."
+
+**Address Cross-Shard Queries**: "Avoid when possible through denormalization. When needed, query all shards and merge results."
+
+**Rebalancing Strategy**: "Use consistent hashing to minimize data movement. Plan for 2x current capacity."
+
+**Real Examples**: "Instagram shards by user_id. Uber shards by geographic region. Twitter uses snowflake IDs."
+
+**Calculate Shard Count**: "With 100M users and 1M per shard, need 100 shards. Add buffer for growth: 150 shards."
+

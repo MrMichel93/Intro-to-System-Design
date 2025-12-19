@@ -426,4 +426,169 @@ Each layer is progressively slower but has more complete data.
 
 ## Next Steps
 
-Complete the challenges to master caching concepts, then explore **[Database Design](../04-database-design/)** to learn how to structure data efficiently!
+Complete the challenges to master caching concepts, then explore **[Database Design](../06-database-design/)** to learn how to structure data efficiently!
+
+## Implementation Approaches
+
+### Approach 1: Application-Level Caching
+- **Description**: Cache implemented within application code using libraries (in-memory cache per instance).
+- **Pros**: Very fast (no network), simple to implement, no external dependencies, low latency (<1ms).
+- **Cons**: Not shared across instances, limited by RAM, cache lost on restart, difficult to invalidate across instances.
+- **When to use**: Single server apps, read-heavy data that rarely changes, development/testing, session-specific data.
+
+### Approach 2: Distributed Cache (Redis, Memcached)
+- **Description**: Standalone cache server shared across all application instances.
+- **Pros**: Shared cache across servers, persistence options (Redis), data structures support, scalable, centralized invalidation.
+- **Cons**: Network latency (1-5ms), additional infrastructure, cost, single point of failure (without clustering).
+- **When to use**: Multi-server deployments, need shared cache, session storage, rate limiting, most production systems.
+
+### Approach 3: CDN Caching
+- **Description**: Cache static assets at edge locations near users globally.
+- **Pros**: Reduces origin load dramatically, global performance, built-in DDoS protection, bandwidth savings.
+- **Cons**: Not for dynamic content, cache invalidation delays, costs money, less control.
+- **When to use**: Static assets (images, CSS, JS), public content, global user base, high bandwidth costs.
+
+### Approach 4: Database Query Caching
+- **Description**: Cache database query results either at database level or application level.
+- **Pros**: Reduces database load significantly, faster response times, can cache complex queries.
+- **Cons**: Invalidation complexity, stale data risks, memory overhead, query key generation complexity.
+- **When to use**: Expensive queries, read-heavy applications, queries with consistent results, aggregation queries.
+
+## Trade-offs
+
+| Aspect | Write-Through | Write-Behind | Cache-Aside |
+|--------|---------------|--------------|-------------|
+| Write Performance | Slower (wait for cache + DB) | Fast (async write) | Fast (skip cache) |
+| Read Performance | Fast (always in cache) | Fast | Moderate (miss penalty) |
+| Consistency | Strong | Eventual | Eventual |
+| Complexity | Moderate | High | Low |
+| Data Loss Risk | None | Possible | None |
+| Use Case | Read-heavy, consistency critical | Write-heavy | General purpose |
+
+| Aspect | Small TTL (5 min) | Large TTL (24 hours) |
+|--------|------------------|---------------------|
+| Data Freshness | Very fresh | Potentially stale |
+| Database Load | Higher | Lower |
+| Cache Hit Rate | Lower | Higher |
+| Use Case | Frequently changing | Rarely changing |
+
+## Capacity Calculations
+
+### Cache Memory Sizing
+```
+Active users: 1,000,000
+Average session data: 10 KB per user
+Session cache: 1M × 10 KB = 10 GB
+
+Product catalog: 100,000 products
+Average product data: 5 KB
+Product cache: 100K × 5 KB = 500 MB
+
+API responses cached: 10,000 unique endpoints
+Average response: 20 KB
+Response cache: 10K × 20 KB = 200 MB
+
+Total cache need: ~11 GB
+With overhead (30%): 14-15 GB
+Recommended: 32 GB Redis instance
+```
+
+### Cache Hit Ratio Impact
+```
+Database capacity: 10,000 QPS
+Total requests: 100,000 QPS
+
+Cache hit ratio: 90%
+Database queries: 100K × 0.1 = 10K QPS ✓
+Cache queries: 90K QPS (handled by cache)
+
+Cache hit ratio: 80%
+Database queries: 100K × 0.2 = 20K QPS ✗ (exceeds capacity)
+
+Need: 85%+ hit ratio to stay within DB capacity
+```
+
+### Eviction Rate Monitoring
+```
+Cache size: 16 GB
+Eviction rate: 100 keys/second
+Average key size: 10 KB
+
+Memory pressure: 100 × 10 KB = 1 MB/s evicted
+Daily evictions: 86 GB (cache churning heavily)
+
+Action needed: Increase cache size or reduce TTL
+Target: <1% of cache size evicted per hour
+```
+
+## Common Patterns
+
+**Cache-Aside (Lazy Loading)**: Application checks cache first, on miss fetches from DB and populates cache. Most common pattern. Simple and effective.
+
+**Write-Through**: Write to cache and database simultaneously. Ensures cache always has latest data. Slower writes but consistent reads.
+
+**Write-Behind (Write-Back)**: Write to cache immediately, asynchronously write to database. Fast writes but risk of data loss if cache fails.
+
+**Refresh-Ahead**: Automatically refresh cached items before they expire based on access patterns. Prevents cache miss storms on popular items.
+
+**Cache Warming**: Pre-populate cache with likely-needed data on startup. Prevents cold start performance issues. Common for product catalogs, popular content.
+
+**Read-Through**: Cache intercepts all reads. On miss, cache fetches from database automatically. Simplifies application code.
+
+**Multi-Layer Caching**: Browser cache → CDN → Application cache → Database query cache. Each layer reduces load on next.
+
+## Anti-Patterns (What NOT to Do)
+
+**Caching Everything**: Caching rarely-accessed or fast-changing data wastes memory. Cache only frequently accessed, expensive-to-compute data.
+
+**No Cache Expiration**: Setting infinite TTL. Stale data accumulates. Old users see outdated information. Always set appropriate TTL.
+
+**Cache Stampede**: Cache expires, many requests simultaneously hit database. Use locking or probabilistic early expiration to prevent.
+
+**Ignoring Memory Limits**: Filling cache beyond capacity causes thrashing. Monitor memory usage and set size limits. Configure eviction policies.
+
+**Not Monitoring Hit Rates**: Assuming cache is working. Low hit rate means ineffective cache. Monitor and optimize based on access patterns.
+
+**Caching User-Specific Data Globally**: Caching data that contains user-specific information accessible to other users. Security vulnerability.
+
+**Complex Cache Keys**: Using complex objects as keys. Difficult to invalidate. Use simple, predictable keys (user_id:123, product:456).
+
+**No Invalidation Strategy**: Caching without thinking about updates. Users see stale data indefinitely. Plan invalidation from the start.
+
+## Interview Tips
+
+**Explain Caching Levels**: "Browser → CDN → Application → Database. Each layer reduces load on next layer."
+
+**Discuss Hit Ratios**: "Target 80-90% hit ratio. 90% means 10x less database load. Monitor with cache.hits / (cache.hits + cache.misses)."
+
+**Calculate Capacity**: "1M users × 10KB session = 10GB cache. Add 30% overhead = 13GB. Recommend 16GB instance."
+
+**Eviction Policies**: "LRU for general purpose. LFU for stable access patterns. TTL for time-sensitive data. Choose based on access pattern."
+
+**Invalidation Strategies**: "TTL for automatic expiration. Active invalidation on updates. Cache tags for grouped invalidation. Version keys for guaranteed freshness."
+
+**Failure Handling**: "Cache failures should not break application. Treat cache as performance enhancement, not requirement. Fallback to database on cache miss."
+
+**Real Examples**: "Facebook caches friend lists in Memcached. Netflix caches movie metadata in EVCache. Reddit uses Redis for voting and comments."
+
+## See It In Action
+
+Complete caching design challenges: **[Caching Challenges](./challenges.md)**
+
+## Additional Resources
+
+**Documentation**:
+- [Redis Documentation](https://redis.io/documentation)
+- [Memcached Wiki](https://github.com/memcached/memcached/wiki)
+- [AWS ElastiCache Best Practices](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/BestPractices.html)
+
+**Articles**:
+- [Caching Best Practices - AWS](https://aws.amazon.com/caching/best-practices/)
+- [Facebook's Memcached Architecture](https://www.facebook.com/notes/facebook-engineering/scaling-memcached-at-facebook/39391378919/)
+- [Cache is King - High Scalability](http://highscalability.com/blog/2009/10/26/facebooks-memcached-multiget-hole-more-machines-more-capacit.html)
+
+**Tools**:
+- **Redis**: In-memory data structure store
+- **Memcached**: High-performance distributed memory caching
+- **Varnish**: HTTP accelerator/caching proxy
+- **redis-cli**: Command line interface for Redis debugging

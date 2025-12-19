@@ -293,4 +293,183 @@ channel.start_consuming()
 
 ## Next Steps
 
-Complete the challenges, then learn about **[CDN](../08-cdn/)** to understand how to deliver content faster globally!
+Complete the challenges, then learn about **[CDN](../14-cdn/)** to understand how to deliver content faster globally!
+
+## Implementation Approaches
+
+### Approach 1: Simple Queue (AWS SQS, Azure Queue)
+- **Description**: Managed queue service for basic message passing without broker complexity.
+- **Pros**: Easy to setup, fully managed, auto-scaling, pay-per-use, no maintenance, built-in redundancy.
+- **Cons**: Limited features (no routing), potential message duplication, limited ordering guarantees, vendor lock-in.
+- **When to use**: Simple background jobs, event notifications, small to medium scale, cloud-native apps, want minimal ops overhead.
+
+### Approach 2: Message Broker (RabbitMQ, ActiveMQ)
+- **Description**: Full-featured message broker with routing, exchanges, and complex messaging patterns.
+- **Pros**: Rich features (routing, pub/sub, RPC), message ordering, priorities, flexible, battle-tested, many client libraries.
+- **Cons**: Need to manage/operate, cluster complexity, resource intensive, requires expertise, scaling requires planning.
+- **When to use**: Complex routing needs, multiple messaging patterns, need message ordering, on-premise deployments, fine-grained control.
+
+### Approach 3: Event Streaming (Kafka, Kinesis)
+- **Description**: Distributed commit log for high-throughput event streaming and processing.
+- **Pros**: Extremely high throughput, message persistence, replay capability, real-time processing, multiple consumers, built for scale.
+- **Cons**: Higher complexity, overkill for simple use cases, operational overhead, requires Kafka expertise, storage costs.
+- **When to use**: Event sourcing, log aggregation, real-time analytics, very high volume (millions/second), need message history/replay.
+
+### Approach 4: In-Memory Queue (Redis, Memcached)
+- **Description**: Fast in-memory data structures for low-latency queueing.
+- **Pros**: Extremely fast (submillisecond), simple, low latency, easy to setup, good for rate limiting.
+- **Cons**: Not durable (data loss on crash), limited persistence, not for critical messages, memory constraints.
+- **When to use**: Rate limiting, temporary queues, very low latency needed, non-critical messages, cache-aside pattern.
+
+## Trade-offs
+
+| Aspect | Simple Queue | Message Broker | Event Stream |
+|--------|--------------|----------------|--------------|
+| Throughput | Medium (1K-10K/s) | Medium (10K-100K/s) | Very High (1M+/s) |
+| Latency | 10-100ms | 1-10ms | 1-5ms |
+| Ordering | Best effort | Guaranteed | Guaranteed (partition) |
+| Persistence | Temporary | Durable | Long-term |
+| Replay | No | No | Yes |
+| Complexity | Low | Medium | High |
+| Cost | Low | Medium | Higher |
+| Operations | Minimal | Moderate | Significant |
+
+| Aspect | At-Most-Once | At-Least-Once | Exactly-Once |
+|--------|--------------|---------------|--------------|
+| Delivery Guarantee | May lose messages | May duplicate | Single delivery |
+| Performance | Fastest | Fast | Slower |
+| Complexity | Simple | Moderate | Complex |
+| Use Case | Non-critical logs | Most applications | Financial transactions |
+
+## Capacity Calculations
+
+### Queue Sizing
+```
+Message rate: 1,000 messages/second
+Average message size: 10 KB
+Processing time: 100ms per message
+
+Queue depth calculation:
+Messages in flight: 1,000 msg/s × 0.1s = 100 messages
+Peak (3x): 300 messages
+
+Consumer capacity needed:
+1,000 msg/s ÷ 10 msg/s per consumer = 100 consumers
+
+With buffer: 150 consumers
+
+Storage requirements (1-day retention):
+1,000 msg/s × 10 KB × 86,400s = 864 GB/day
+```
+
+### Throughput Planning
+```
+Business requirement: 10M orders/day
+Peak hour (10% of daily): 1M orders/hour
+Peak minute: 17K orders/minute = 280 orders/second
+
+Message types:
+- Order created: 280 msg/s
+- Payment processing: 280 msg/s  
+- Notification: 280 msg/s
+- Analytics: 280 msg/s
+Total: 1,120 msg/s
+
+Queue system capacity:
+RabbitMQ: 20K msg/s ✓
+Kafka: 1M+ msg/s ✓✓
+SQS: 3K msg/s per queue (need 1 queue) ✓
+```
+
+### Dead Letter Queue Monitoring
+```
+Main queue throughput: 10,000 msg/s
+Expected error rate: 0.1%
+DLQ rate: 10 msg/s
+
+Alert thresholds:
+Warning: DLQ rate > 50 msg/s (0.5% error)
+Critical: DLQ rate > 200 msg/s (2% error)
+
+Review DLQ daily for patterns
+```
+
+## Common Patterns
+
+**Work Queue**: Single queue with multiple competing consumers. Each message processed by exactly one consumer. Load balanced across workers automatically.
+
+**Pub/Sub**: Publisher sends to topic, multiple subscribers receive copies. Enables event broadcasting to multiple services. Good for notifications.
+
+**Request-Reply**: Client sends request to queue, worker processes and replies to response queue. Enables asynchronous RPC. Use correlation ID to match responses.
+
+**Priority Queue**: Higher priority messages processed first. VIP users or critical tasks get faster processing. Prevents head-of-line blocking.
+
+**Delayed Queue**: Messages become visible after delay. Useful for retry with backoff, scheduled tasks, rate limiting. Native in SQS, plugin in RabbitMQ.
+
+**Message Routing**: Route messages based on content/headers. Orders to order-queue, notifications to notification-queue. Keeps concerns separated.
+
+**Circuit Breaker with Queue**: Stop publishing to queue when downstream service failing. Prevent message buildup. Resume when service healthy.
+
+## Anti-Patterns (What NOT to Do)
+
+**Synchronous Queue Polling**: Constantly polling empty queue wastes resources. Use long polling or push-based consumption instead.
+
+**Large Messages**: Sending large payloads (images, files) through queue. Store in S3/blob storage, send reference in message. Keeps queue fast.
+
+**No Error Handling**: Not handling consumer failures. Messages reprocessed infinitely or lost. Implement retries with exponential backoff and DLQ.
+
+**Ignoring Queue Depth**: Not monitoring queue size. Growing queue indicates consumers can't keep up. Scale consumers or investigate bottleneck.
+
+**No Idempotency**: Processing same message twice causes issues (double charge). Make consumers idempotent. Check if already processed before acting.
+
+**Queue as Database**: Using queue for long-term storage. Queues are for transit, not storage. Messages should be processed and removed quickly.
+
+**Fire and Forget**: Publishing without confirmation. Message might not reach queue. Wait for acknowledgment for critical messages.
+
+**No DLQ Strategy**: Messages that fail repeatedly stay in queue forever. Configure DLQ after N retries. Review DLQ regularly.
+
+## Interview Tips
+
+**Explain Async Benefits**: "Message queues decouple services. Producer doesn't wait for consumer. Better scalability and failure isolation."
+
+**Discuss Guarantees**: "At-least-once delivery means duplicates possible. Make consumers idempotent. Exactly-once is expensive, use only when needed."
+
+**Calculate Capacity**: "With 1K msg/s and 100ms processing, need 100 consumers. Add 50% buffer for 150 consumers."
+
+**Error Handling**: "Implement exponential backoff retries. After 3 attempts, send to DLQ for manual review. Log all failures."
+
+**Queue vs Database**: "Queue for communication and task distribution. Database for persistent storage. Don't use queue as database."
+
+**Real Examples**: "Netflix uses SQS for encoding jobs. Uber uses Kafka for trip events. LinkedIn uses Kafka for activity streams."
+
+**Monitoring**: "Track queue depth, consumer lag, processing time, error rates, DLQ size. Alert on growing queue depth."
+
+**Failure Scenarios**: "If consumer crashes, message returns to queue after visibility timeout. If queue service down, buffer in producer or circuit break."
+
+## See It In Action
+
+Complete the message queue challenges: **[Message Queue Challenges](./challenges.md)**
+
+Design a message queue system for an e-commerce platform handling order processing at Black Friday scale.
+
+## Additional Resources
+
+**Documentation**:
+- [AWS SQS Documentation](https://docs.aws.amazon.com/sqs/)
+- [RabbitMQ Tutorial](https://www.rabbitmq.com/getstarted.html)
+- [Apache Kafka Documentation](https://kafka.apache.org/documentation/)
+
+**Articles**:
+- [Microservices Messaging: Why REST Isn't Always the Best Choice](https://www.infoq.com/articles/messaging-rest-not-always-best/)
+- [You Cannot Have Exactly-Once Delivery](https://bravenewgeek.com/you-cannot-have-exactly-once-delivery/)
+- [Understanding When to Use RabbitMQ or Apache Kafka](https://content.pivotal.io/blog/understanding-when-to-use-rabbitmq-or-apache-kafka)
+
+**Tools**:
+- **RabbitMQ Management**: Web UI for queue monitoring
+- **Kafka Manager**: Cluster management tool
+- **Celery**: Distributed task queue for Python
+- **Bull**: Redis-based queue for Node.js
+
+**Books**:
+- "Enterprise Integration Patterns" by Hohpe & Woolf
+- "Kafka: The Definitive Guide" by Narkhede, Shapira, Palino
