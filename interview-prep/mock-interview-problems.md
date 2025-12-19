@@ -230,7 +230,7 @@ Customers/Drivers → Load Balancer → API Gateway
 - [Database Design](../06-database-design/)
 - [Message Queues](../11-message-queues/)
 - [API Design](../10-api-design/)
-- [Case Study: Uber](../case-studies/ride-sharing.md)
+- [Case Study: Ride Sharing](../case-studies/ride-sharing.md) (similar location matching concepts)
 
 ### Success Criteria
 

@@ -336,7 +336,7 @@ Users → CDN (video delivery) → Origin Servers
 - [CDN](../14-cdn/)
 - [Message Queues](../11-message-queues/)
 - [Database Design](../06-database-design/)
-- [Case Study: Netflix](../case-studies/)
+- [Case Study: Video Streaming](../case-studies/video-streaming.md)
 
 ---
 
