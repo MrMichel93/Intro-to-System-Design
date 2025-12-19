@@ -364,6 +364,219 @@ Payment: CP (must be consistent)
 
 ---
 
+## Beyond CAP: PACELC Theorem
+
+While CAP theorem is fundamental, it only describes behavior **during network partitions**. But what about normal operation when there are no partitions?
+
+### What is PACELC?
+
+**PACELC** is an extension of CAP that provides a more complete picture:
+
+**if Partition, then Availability vs Consistency, ELSE Latency vs Consistency**
+
+```
+┌─────────────────────────────────────┐
+│         Network Partition?          │
+└─────────┬───────────────────────────┘
+          │
+    ┌─────▼─────┐
+    │    Yes    │ → Choose between Availability (A) or Consistency (C)
+    └───────────┘   [This is CAP theorem]
+          │
+    ┌─────▼─────┐
+    │     No    │ → Choose between Latency (L) or Consistency (C)
+    └───────────┘   [This is the ELSE part]
+```
+
+### The ELSE Part: Latency vs Consistency
+
+**Even without partitions**, distributed systems face a trade-off:
+
+#### High Consistency = Higher Latency
+When there's no partition, maintaining strong consistency requires:
+- Waiting for all replicas to confirm writes
+- Synchronous replication
+- Coordination between nodes
+
+This adds latency to every operation.
+
+#### Low Latency = Weaker Consistency
+To achieve low latency, you might:
+- Return success after writing to one node
+- Use asynchronous replication
+- Allow replicas to be temporarily inconsistent
+
+This sacrifices consistency for speed.
+
+### PACELC Classification of Systems
+
+Systems can be classified as:
+
+#### PA/EL Systems (Availability + Low Latency)
+**Choose**: Availability during partitions, Low latency normally
+
+**Examples**: 
+- **Cassandra**: Prioritizes both availability and low latency
+- **DynamoDB**: Optimized for high availability and performance
+- **Riak**: Designed for high availability with tunable consistency
+
+**When to use**:
+- High-traffic web applications
+- Content delivery systems
+- Analytics platforms
+- IoT data collection
+
+#### PA/EC Systems (Availability + Consistency)
+**Choose**: Availability during partitions, Consistency when no partition
+
+**Examples**:
+- **MongoDB** (with appropriate settings)
+
+**When to use**:
+- Systems that need strong consistency in normal operations
+- But can tolerate stale reads during network issues
+
+#### PC/EL Systems (Consistency + Low Latency)
+**Choose**: Consistency during partitions, Low latency normally
+
+**Rare in practice** because maintaining consistency during partitions usually means unavailability.
+
+#### PC/EC Systems (Consistency Always)
+**Choose**: Consistency over everything
+
+**Examples**:
+- **VoltDB**: Strong consistency, but may sacrifice availability
+- **HBase**: Prioritizes consistency
+- **Traditional RDBMS with synchronous replication**
+
+**When to use**:
+- Financial systems
+- Inventory management
+- Booking systems
+- Any system where consistency is critical
+
+### Real-World Example: DynamoDB (PA/EL)
+
+**DynamoDB** is a PA/EL system:
+
+**During Partition (PA)**:
+- Remains available
+- Accepts reads and writes
+- Uses eventual consistency
+
+**Normal Operation (EL)**:
+- Optimized for low latency (single-digit milliseconds)
+- Asynchronous replication
+- Eventual consistency by default (strong consistency available as option)
+
+**Trade-off**: Accepts potential inconsistency for better performance and availability.
+
+### Real-World Example: Traditional SQL with Sync Replication (PC/EC)
+
+**PostgreSQL with synchronous replication**:
+
+**During Partition (PC)**:
+- Chooses consistency
+- Write fails if can't reach replica
+- Maintains data integrity
+
+**Normal Operation (EC)**:
+- Every write waits for replica confirmation
+- Higher latency (10-100ms typical)
+- Guarantees consistency
+
+**Trade-off**: Accepts higher latency and potential unavailability for guaranteed consistency.
+
+### Why PACELC Matters More Than CAP
+
+1. **Most of the time, there are no partitions**
+   - Network partitions are relatively rare
+   - Your system operates in "normal" mode 99%+ of the time
+   - The "else" part affects daily performance
+
+2. **Latency is always relevant**
+   - Users experience latency every request
+   - Latency affects user satisfaction
+   - Can't be ignored
+
+3. **Better decision framework**
+   - CAP: Only considers partition scenario
+   - PACELC: Considers both partition and normal operation
+   - More complete picture for design decisions
+
+### How to Choose: PACELC Decision Guide
+
+Ask these questions:
+
+**1. During network partition:**
+```
+Is availability more important than consistency?
+├─ Yes → PA (Keep system available, accept inconsistency)
+└─ No → PC (Ensure consistency, accept downtime)
+```
+
+**2. During normal operation:**
+```
+Is low latency more important than strong consistency?
+├─ Yes → EL (Optimize for speed, eventual consistency)
+└─ No → EC (Wait for all replicas, strong consistency)
+```
+
+### Common Patterns
+
+| System Type | Partition | Normal | Use Case |
+|------------|-----------|---------|----------|
+| **PA/EL** | Available | Fast | Social media, caching, analytics |
+| **PA/EC** | Available | Consistent | E-commerce (some parts) |
+| **PC/EC** | Consistent | Consistent | Banking, inventory, bookings |
+
+### Practical Example: E-Commerce Site
+
+Different components can use different PACELC strategies:
+
+```
+Product Catalog: PA/EL
+- High availability (always show products)
+- Low latency (fast browsing)
+- Eventual consistency OK (price updates can lag)
+
+Shopping Cart: PA/EL
+- Always available (don't lose carts)
+- Fast operations
+- Eventual consistency acceptable
+
+Inventory Count: PC/EC
+- Consistency during partition (prevent overselling)
+- Consistency normally (accurate counts)
+- Slight latency acceptable
+
+Order Processing: PC/EC
+- Consistency critical
+- Accuracy over speed
+- Can wait for confirmation
+
+User Reviews: PA/EL
+- Always available
+- Fast to post/read
+- Eventual consistency fine
+```
+
+### Summary: CAP vs PACELC
+
+**CAP Theorem**:
+- Foundation of distributed systems
+- Focuses on partition scenario
+- Choose 2 of 3: C, A, P
+
+**PACELC Theorem**:
+- More complete view
+- Considers normal operation too
+- PA/EL, PA/EC, PC/EL, or PC/EC
+
+**Key Insight**: Understanding PACELC helps you make better design decisions because you're considering your system's behavior in both failure and normal scenarios.
+
+---
+
 ## Common Misconceptions
 
 ### ❌ Myth 1: "CP means zero availability"
