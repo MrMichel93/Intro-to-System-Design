@@ -325,6 +325,172 @@ Block-level sync: 2 MB file, 10 KB changed
 
 ---
 
+## Exercise 6: Estimate Resources for YouTube
+
+### Scenario
+Design capacity estimates for a video platform like YouTube.
+
+### Given
+- 500 hours of video uploaded every minute
+- Average video length: 10 minutes
+- Average video size: 1 GB (after compression)
+- 5 billion video views per day
+- Average view watches 50% of video
+- Store videos for 10 years
+- Multiple quality versions (360p, 720p, 1080p, 4K)
+
+### Your Task
+Calculate:
+1. **Daily upload volume** (storage needed per day)
+2. **Total storage for 10 years** (with multiple quality versions)
+3. **Daily bandwidth for views** (serving videos to users)
+4. **Number of CDN edge locations** (assuming 100 Gbps per location)
+5. **Storage cost estimation** (at $0.02 per GB per month)
+
+<details>
+<summary>Solution</summary>
+
+**1. Daily Upload Volume:**
+```
+Uploads per minute: 500 hours = 500 × 60 = 30,000 minutes of video
+Number of videos (10 min each): 30,000 / 10 = 3,000 videos per minute
+
+Storage per minute: 3,000 videos × 1 GB = 3,000 GB = 3 TB
+Storage per hour: 3 TB × 60 = 180 TB
+Storage per day: 180 TB × 24 = 4,320 TB ≈ 4.3 PB per day
+```
+
+**2. Total Storage for 10 Years:**
+```
+Original quality per year: 4.3 PB × 365 = 1,570 PB ≈ 1.6 EB per year
+10 years: 1.6 EB × 10 = 16 EB
+
+Multiple quality versions:
+- 360p: 0.3 GB (30% of original)
+- 720p: 0.6 GB (60% of original)  
+- 1080p: 1 GB (100% - this is our baseline)
+- 4K: 4 GB (400% of original)
+
+Total storage multiplier: 0.3 + 0.6 + 1 + 4 = 5.9x
+Total storage: 16 EB × 5.9 = 94.4 EB ≈ 95 exabytes
+
+With replication (3x): 95 EB × 3 = 285 EB
+```
+
+**3. Daily Bandwidth for Views:**
+```
+Views per day: 5 billion
+Average watch duration: 50% of 10 minutes = 5 minutes
+
+Most views are 720p: ~0.6 GB per video
+Bandwidth per view: 0.6 GB × 50% = 0.3 GB
+
+Total data transfer: 5B views × 0.3 GB = 1.5B GB = 1.5 PB per day
+Bandwidth: 1.5 PB / 86,400 seconds = ~17.4 GB/second = 139 Gigabits/sec
+
+Peak traffic (3x average): 417 Gigabits/sec
+```
+
+**4. CDN Edge Locations:**
+```
+Peak bandwidth needed: 417 Gbps
+Capacity per location: 100 Gbps
+
+Locations needed: 417 / 100 = 4.17 ≈ 5 locations (minimum)
+
+For redundancy and global coverage: 50-100 edge locations
+(Distribute across continents, major cities)
+
+Reasoning:
+- Not all traffic to one location
+- Serve users from nearest location
+- Need redundancy for failures
+- Consider regional regulations
+```
+
+**5. Storage Cost Estimation:**
+```
+Total storage: 95 EB (without replication)
+= 95,000,000,000 GB
+
+Monthly cost: 95,000,000,000 GB × $0.02 = $1,900,000,000
+Annual cost: $1.9B × 12 = $22.8 billion per year
+
+With replication (3x): $68.4 billion per year
+
+Cost optimizations:
+- Use cheaper cold storage for old videos
+- Compress older videos more aggressively
+- Delete videos with zero views after X years
+- Use tiered storage (hot/warm/cold)
+- Negotiate bulk pricing
+
+Realistic costs with optimizations: $5-10 billion per year
+```
+
+**Additional Considerations:**
+
+**Transcoding:**
+```
+Need to convert uploaded videos to multiple formats:
+- 3,000 videos per minute
+- ~5 formats per video
+- 15,000 transcoding jobs per minute
+- Requires massive transcoding infrastructure
+```
+
+**Database (Metadata):**
+```
+Per video metadata: 10 KB
+Daily uploads: 3,000 videos/min × 60 × 24 = 4.32M videos/day
+Daily metadata: 4.32M × 10 KB = 43.2 GB/day
+10 years: 43.2 GB × 365 × 10 = 157.7 TB (manageable)
+```
+
+**Comments and Interactions:**
+```
+Assume 1% of videos get comments
+Average 100 comments per video
+Comment storage: ~1 KB each
+
+Daily comment storage: 4.32M × 1% × 100 × 1 KB = 432 GB/day
+10 years: 432 GB × 365 × 10 = 1.58 PB (small compared to videos)
+```
+
+**Cache Strategy:**
+```
+80/20 rule: 20% of videos get 80% of views
+Hot videos to cache: 20% of library
+Cache size needed: 95 EB × 20% = 19 EB (still too large)
+
+Better strategy: Cache by recency
+- Videos from last 7 days: 4.3 PB × 7 = 30 PB
+- This represents most views
+- Much more manageable cache size
+```
+
+**System Design Insights:**
+
+1. **Storage is the biggest cost** - Need to optimize aggressively
+2. **CDN is essential** - Can't serve 400+ Gbps from origin
+3. **Transcoding pipeline is critical** - Must be highly scalable
+4. **Tiered storage is necessary** - Can't keep everything hot
+5. **Intelligent caching** - Cache recent and popular, not everything
+6. **Geographic distribution** - Must have servers worldwide
+7. **Cost management is key** - Storage costs dominate, must optimize
+
+**Technology Stack Suggestions:**
+- **Storage**: Object storage (S3, GCS) with lifecycle policies
+- **CDN**: Global CDN (CloudFront, Akamai, Fastly)
+- **Transcoding**: Distributed transcoding clusters using FFmpeg (with Kubernetes/job queues)
+- **Database**: Distributed SQL for metadata (Spanner, CockroachDB)
+- **Cache**: Redis/Memcached for hot metadata
+- **Analytics**: Data warehouse (BigQuery, Snowflake) for view tracking
+
+</details>
+
+---
+
 ## Practice Template
 
 Use this template for your own calculations:

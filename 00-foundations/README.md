@@ -261,43 +261,104 @@ Always clarify:
 
 **Example**: Netflix, Amazon
 
-## The System Design Process
+## Design Process Framework
 
-### Step 1: Understand Requirements
-- Ask clarifying questions
-- Define functional requirements
-- Identify non-functional requirements
-- Establish constraints
+Follow this 8-step framework when designing any system:
 
-### Step 2: Establish Scope
-- Define what's in scope
-- What's out of scope
-- Expected timeline
-- Available resources
+### Step 1: Clarify Requirements
+- Ask clarifying questions to understand the problem
+- Define functional requirements (what the system should do)
+- Identify non-functional requirements (how the system should behave)
+- Establish constraints and assumptions
+- Understand the scope
 
-### Step 3: High-Level Design
-- Identify major components
-- Draw architecture diagram
-- Define data flow
-- Choose technologies
+**Example Questions:**
+- How many users will the system support?
+- What are the key features?
+- What's the expected traffic pattern?
+- Are there any specific performance requirements?
 
-### Step 4: Detailed Design
-- Deep dive into critical components
+### Step 2: Estimate Scale
+- Calculate expected traffic (requests per second)
+- Estimate storage requirements
+- Determine bandwidth needs
+- Plan for growth over time
+- Use back-of-envelope calculations
+
+**Example:**
+- Daily active users: 10 million
+- Average requests per user: 20
+- Total daily requests: 200 million
+- Requests per second: ~2,300 (200M / 86,400)
+
+### Step 3: Define APIs
+- Design the key interfaces
+- Specify API endpoints (REST, GraphQL, etc.)
+- Define request/response formats
+- Consider API versioning
+- Document expected behavior
+
+**Example APIs for a URL shortener:**
+```
+POST /api/shorten - Create short URL
+GET  /api/:shortUrl - Redirect to original URL
+GET  /api/stats/:shortUrl - Get click statistics
+```
+
+### Step 4: Define Data Model
+- Identify entities and their relationships
 - Design database schema
-- Define APIs
-- Plan for scaling
+- Choose appropriate data types
+- Plan for data access patterns
+- Consider indexing strategy
 
-### Step 5: Identify Bottlenecks
-- Single points of failure?
-- Performance bottlenecks?
-- Security vulnerabilities?
-- Scaling limitations?
+**Example Schema:**
+```
+Users: id, email, created_at
+URLs: id, original_url, short_code, user_id, created_at
+Clicks: id, url_id, timestamp, user_agent, ip_address
+```
 
-### Step 6: Optimize and Iterate
-- Add caching
+### Step 5: High-Level Design
+- Draw architecture diagram
+- Identify major components (clients, servers, databases, caches)
+- Show data flow between components
+- Choose technology stack
+- Keep it simple initially
+
+### Step 6: Detailed Design
+- Deep dive into critical components
+- Design algorithms for core features
+- Plan for data consistency
+- Consider security measures
+- Design for reliability
+
+### Step 7: Identify Bottlenecks
+- Find single points of failure
+- Identify performance bottlenecks
+- Discover scaling limitations
+- Consider security vulnerabilities
+- Think about edge cases
+
+**Common Bottlenecks:**
+- Database becomes read/write bottleneck
+- Single server can't handle traffic
+- Network bandwidth limitations
+- Storage capacity constraints
+
+### Step 8: Scale the Design
+- Add caching layers
 - Implement load balancing
-- Database optimization
-- Consider trade-offs
+- Use database replication and sharding
+- Add CDN for static content
+- Consider microservices for specific components
+- Plan for horizontal scaling
+
+**Scaling Strategies:**
+- Cache frequently accessed data
+- Distribute load across multiple servers
+- Partition data across databases
+- Use message queues for async processing
 
 ## Common System Design Principles
 
@@ -321,6 +382,173 @@ Assume components will fail and plan accordingly.
 
 ### 6. Stateless When Possible
 Stateless services are easier to scale and maintain.
+
+## Thinking in Trade-offs
+
+**The Golden Rule of System Design**: Every decision has costs and benefits. There is no "perfect" solution—only solutions that are appropriate for specific requirements and constraints.
+
+### Why Trade-offs Matter
+
+When you design a system, you're constantly making choices:
+- SQL or NoSQL database?
+- Synchronous or asynchronous processing?
+- Strong consistency or high availability?
+- Monolithic or microservices architecture?
+
+**Each choice involves trade-offs**. Understanding these trade-offs is what separates good system designers from great ones.
+
+### Common Trade-offs in System Design
+
+#### 1. Performance vs Scalability
+- **Performance**: How fast a single request is processed
+- **Scalability**: How many requests the system can handle
+
+**Trade-off**: Sometimes optimizations for a single request make it harder to scale.
+
+**Example:**
+- Complex in-memory cache = Fast (high performance)
+- But hard to scale across multiple servers (low scalability)
+
+#### 2. Consistency vs Availability
+See CAP Theorem (Module 02) for deep dive.
+
+- **Strong Consistency**: All nodes see same data (may be unavailable during failures)
+- **High Availability**: System always responds (may serve stale data)
+
+**Example:**
+- Banking: Choose consistency (wrong balance is unacceptable)
+- Social media: Choose availability (delayed posts are acceptable)
+
+#### 3. Latency vs Throughput
+- **Latency**: Time to complete a single operation
+- **Throughput**: Number of operations completed per unit time
+
+**Trade-off**: Batching increases throughput but adds latency.
+
+**Example:**
+- Send each email immediately = Low latency, lower throughput
+- Batch 100 emails and send together = Higher latency, higher throughput
+
+#### 4. Read Performance vs Write Performance
+- **Optimize for reads**: Use caching, read replicas (but writes become complex)
+- **Optimize for writes**: Simple write path (but reads may be slower)
+
+**Example:**
+- Twitter: Read-heavy (optimize for fast timeline reads)
+- Log system: Write-heavy (optimize for fast log writes)
+
+#### 5. Cost vs Everything Else
+More resources generally improve performance, availability, and reliability—but at a cost.
+
+**Trade-off:**
+- Running on 10 servers = More reliable, more expensive
+- Running on 3 servers = Less reliable, more affordable
+
+**Startups often choose**: Acceptable reliability at minimal cost
+
+### How to Evaluate Trade-offs
+
+When facing a design decision, ask:
+
+1. **What are we optimizing for?**
+   - Speed? Cost? Reliability? Simplicity?
+
+2. **What are the requirements?**
+   - What does the business actually need?
+   - What can we compromise on?
+
+3. **What are the constraints?**
+   - Budget limitations?
+   - Time to market?
+   - Team expertise?
+
+4. **What happens at scale?**
+   - Does this decision scale to 10x, 100x users?
+
+5. **Can we change our mind later?**
+   - Is this decision reversible?
+   - What's the cost of changing?
+
+### Trade-off Decision Framework
+
+```
+For each design choice:
+┌─────────────────────────────────────┐
+│  What are the options?              │
+│  (List 2-3 viable approaches)       │
+└────────────┬────────────────────────┘
+             │
+┌────────────▼────────────────────────┐
+│  What are the pros and cons?        │
+│  (For each option)                  │
+└────────────┬────────────────────────┘
+             │
+┌────────────▼────────────────────────┐
+│  Which aligns with requirements?    │
+│  (Match to your specific needs)     │
+└────────────┬────────────────────────┘
+             │
+┌────────────▼────────────────────────┐
+│  Make decision and document why     │
+│  (Explain reasoning for later)      │
+└─────────────────────────────────────┘
+```
+
+### Real-World Trade-off Examples
+
+#### Example 1: Choosing a Database
+
+**Scenario**: Building a social media app
+
+**Options:**
+1. **SQL Database (PostgreSQL)**
+   - ✅ Pros: ACID guarantees, complex queries, mature ecosystem
+   - ❌ Cons: Harder to scale horizontally, schema changes difficult
+
+2. **NoSQL Database (MongoDB)**
+   - ✅ Pros: Flexible schema, easy horizontal scaling, fast writes
+   - ❌ Cons: Weaker consistency, complex queries harder
+
+**Decision Factors:**
+- Data structure: User profiles (structured) vs posts (semi-structured)
+- Scale: Need to handle millions of users
+- Consistency needs: User profiles need consistency, posts can be eventual
+
+**Choice**: Hybrid approach
+- PostgreSQL for user accounts and relationships (need consistency)
+- MongoDB for posts and feeds (need scale and flexibility)
+
+#### Example 2: Caching Strategy
+
+**Scenario**: E-commerce product catalog
+
+**Options:**
+1. **Cache Everything**
+   - ✅ Pros: Fastest possible reads
+   - ❌ Cons: High memory costs, stale data issues, cache invalidation complexity
+
+2. **Cache Nothing**
+   - ✅ Pros: Always fresh data, simple architecture
+   - ❌ Cons: Slow reads, high database load
+
+3. **Selective Caching** (80/20 rule)
+   - ✅ Pros: Good performance, reasonable cost, balanced
+   - ❌ Cons: More complex than extremes
+
+**Choice**: Selective caching
+- Cache top 20% products (generate 80% traffic)
+- Cache with 5-minute TTL (balance freshness vs performance)
+- Invalidate cache on price/inventory changes
+
+### Key Takeaways
+
+✅ **No perfect solutions** - Only appropriate solutions for specific contexts  
+✅ **Document your reasoning** - Future you (or your team) will thank you  
+✅ **Be willing to change** - Requirements change, so should your design  
+✅ **Consider scale** - What works for 100 users may not work for 100 million  
+✅ **Understand the business** - Technical decisions should serve business needs  
+
+**Remember**: The best system designers don't memorize solutions—they understand trade-offs and make informed decisions based on requirements.
 
 ## Real-World Example: Designing a Todo App
 
