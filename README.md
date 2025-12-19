@@ -82,19 +82,19 @@ By the end of this course, you will:
 Answer these questions honestly to check your readiness:
 
 1. **Can you write a simple program** (in any language) that reads user input and processes it?
-   - Yes → You're good! | No → Brush up on basic programming first
+   - Yes → You're good! · No → Brush up on basic programming first
 
 2. **Do you understand what a database is** and why applications use them?
-   - Yes → Great! | No → Read about databases basics, then come back
+   - Yes → Great! · No → Read about databases basics, then come back
 
 3. **Have you used web applications** like social media, streaming services, or e-commerce?
-   - Yes → Perfect! | No → Start exploring popular apps
+   - Yes → Perfect! · No → Start exploring popular apps
 
 4. **Are you comfortable with basic math** (multiplication, division, working with large numbers)?
-   - Yes → Excellent! | No → Practice basic calculations — you'll need them
+   - Yes → Excellent! · No → Practice basic calculations — you'll need them
 
 5. **Are you curious about how things work** at scale?
-   - Yes → You'll love this course! | No → Consider if this is the right time
+   - Yes → You'll love this course! · No → Consider if this is the right time
 
 **If you answered "Yes" to questions 1, 2, and 4**, you're ready to start!
 
@@ -283,9 +283,9 @@ Follow the Complete Beginner Path, but add:
 - Compare your designs with provided solutions
 
 **Time Commitment Summary**:
-- Complete Beginner: 32-50 hours total (8-10 weeks)
-- Interview Prep: 24-48 hours total (4-6 weeks)
-- Deep Dive: 60-105 hours total (12-15 weeks)
+- Complete Beginner: 32-50 hours total over 8-10 weeks
+- Interview Prep: 24-48 hours total over 4-6 weeks  
+- Deep Dive: 60-105 hours total over 12-15 weeks
 
 ## 6. How to Use This Course
 
@@ -344,44 +344,44 @@ Throughout this course, you'll design systems of increasing complexity. Here's y
 ### Level 1: Foundation Projects (Weeks 1-3)
 **1. URL Shortener (like bit.ly)**
 - Learn: Basic database design, hashing, simple scaling
-- Complexity: ⭐☆☆☆☆
+- Complexity: Level 1/5 (Beginner)
 - Key Concepts: ID generation, redirects, analytics
 
 **2. Pastebin (code snippet sharing)**
 - Learn: Text storage, caching, expiration policies
-- Complexity: ⭐☆☆☆☆
+- Complexity: Level 1/5 (Beginner)
 - Key Concepts: TTL, content delivery, basic security
 
 ### Level 2: Intermediate Projects (Weeks 4-6)
 **3. Twitter/X (social media timeline)**
 - Learn: Feed generation, fan-out patterns, real-time updates
-- Complexity: ⭐⭐⭐☆☆
+- Complexity: Level 3/5 (Intermediate)
 - Key Concepts: Write patterns, read patterns, graph data
 
 **4. Instagram (photo sharing platform)**
 - Learn: Media storage, CDN usage, feed ranking
-- Complexity: ⭐⭐⭐☆☆
+- Complexity: Level 3/5 (Intermediate)
 - Key Concepts: Object storage, image optimization, social graphs
 
 **5. Messaging System (like WhatsApp)**
 - Learn: Real-time communication, delivery guarantees, encryption
-- Complexity: ⭐⭐⭐⭐☆
+- Complexity: Level 4/5 (Advanced)
 - Key Concepts: WebSockets, message queues, presence systems
 
 ### Level 3: Advanced Projects (Weeks 7-10)
 **6. Video Streaming Platform (like Netflix)**
 - Learn: Video encoding, adaptive bitrate, global distribution
-- Complexity: ⭐⭐⭐⭐☆
+- Complexity: Level 4/5 (Advanced)
 - Key Concepts: CDN strategy, transcoding pipelines, recommendations
 
 **7. Ride Sharing Service (like Uber)**
 - Learn: Geospatial indexing, real-time matching, surge pricing
-- Complexity: ⭐⭐⭐⭐⭐
+- Complexity: Level 5/5 (Expert)
 - Key Concepts: Location services, distributed matching, payment systems
 
 **8. E-commerce Platform (like Amazon)**
 - Learn: Inventory management, order processing, payment flows
-- Complexity: ⭐⭐⭐⭐⭐
+- Complexity: Level 5/5 (Expert)
 - Key Concepts: Transactions, consistency, search systems
 
 ### Progression Strategy
