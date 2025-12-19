@@ -277,22 +277,163 @@ Route users to nearest data center
 6. **Enable SSL Termination**: Simplify certificate management
 7. **Test Failover**: Regularly test what happens when servers fail
 
-## Challenges
+## How It Works
 
-1. **Single Point of Failure**: Load balancer itself can fail (use redundancy)
-2. **Bottleneck**: Load balancer can become the bottleneck at very high scale
-3. **Cost**: Hardware load balancers are expensive
-4. **Complexity**: More moving parts to configure and monitor
+**Step 1 - Client Request Initiation**: User types URL in browser. DNS resolves to load balancer's IP address. All traffic funnels through this single entry point.
 
-## Summary
+**Step 2 - Load Balancer Receives Request**: Load balancer accepts the incoming TCP connection. Maintains connection state if necessary. Logs request for monitoring.
 
-- Load balancers distribute traffic across multiple servers
-- Many algorithms available (Round Robin, Least Connections, etc.)
-- Layer 4 vs Layer 7 routing offer different capabilities
-- Health checks ensure traffic only goes to healthy servers
-- Essential for high availability and scalability
-- Avoid sticky sessions; use shared session storage instead
+**Step 3 - Algorithm Selection**: Load balancer applies configured algorithm to select target server from healthy backend pool.
 
-## Next Steps
+**Step 4 - Health Check Validation**: Before routing, verifies selected server passed recent health checks. If unhealthy, selects alternative server.
 
-Complete the challenges to test your knowledge, then move on to **[Caching](../03-caching/)** to learn how to make your applications even faster!
+**Step 5 - Request Forwarding**: Forwards request to selected backend server. May modify headers (add X-Forwarded-For with client IP).
+
+**Step 6 - Server Processing**: Backend server processes request and generates response. Load balancer waits while potentially handling thousands of other requests.
+
+**Step 7 - Response Return**: Server sends response back to load balancer. Load balancer forwards to original client.
+
+**Step 8 - Connection Management**: For HTTP/1.1, may keep connection alive for subsequent requests. Tracks metrics for capacity planning.
+
+## Visual Architecture
+
+```
+             Internet / Users
+                   |
+           ┌───────▼────────┐
+           │  Load Balancer │
+           │  - Routes req  │
+           │  - Health chk  │
+           │  - SSL term    │
+           └────┬──┬──┬────┘
+                |  |  |
+       ┌────────┘  |  └────────┐
+       ▼           ▼           ▼
+┌───────────┐ ┌─────────┐ ┌─────────┐
+│ Server 1  │ │Server 2 │ │Server 3 │
+│ Health:✓  │ │Health:✓ │ │Health:✗ │
+└───────────┘ └─────────┘ └─────────┘
+```
+
+## Implementation Approaches
+
+### Approach 1: Hardware Load Balancer
+- **Description**: Dedicated physical appliances optimized for load balancing with specialized ASICs.
+- **Pros**: Extremely high performance, advanced features, vendor support.
+- **Cons**: Very expensive, vendor lock-in, limited flexibility.
+- **When to use**: Enterprise with budget, extreme performance needs, on-premise datacenters.
+
+### Approach 2: Software Load Balancer  
+- **Description**: Open-source software (Nginx/HAProxy) running on standard servers.
+- **Pros**: Cost-effective, highly flexible, runs anywhere.
+- **Cons**: Requires server management, need expertise to configure.
+- **When to use**: Most production applications, teams with DevOps capability, cost-conscious.
+
+### Approach 3: Cloud-Native Load Balancers
+- **Description**: Managed services from cloud providers (AWS ALB/NLB, GCP LB, Azure LB).
+- **Pros**: Zero operational overhead, automatic scaling, pay-per-use.
+- **Cons**: Vendor lock-in, can be expensive at scale, less customization.
+- **When to use**: Cloud-first applications, startups, want managed infrastructure.
+
+### Approach 4: Service Mesh
+- **Description**: Application-layer networking with sidecar proxies (Envoy/Istio).
+- **Pros**: Advanced traffic management, observability built-in, microservices-aware.
+- **Cons**: Complex operational model, resource overhead, steep learning curve.
+- **When to use**: Microservices architecture, Kubernetes environments.
+
+## Trade-offs
+
+| Aspect | Layer 4 LB | Layer 7 LB |
+|--------|------------|------------|
+| Performance | Very High | Moderate |
+| Latency | <1ms | 1-10ms |
+| Routing | IP/Port only | URL, headers, content |
+| SSL Inspection | No | Yes |
+| Use Case | High throughput | Application-aware |
+
+| Aspect | Sticky Sessions | Stateless + Session Store |
+|--------|-----------------|--------------------------|
+| Load Distribution | Uneven | Even |
+| Failure Handling | Lost sessions | No impact |
+| Scaling | Difficult | Easy |
+
+## Capacity Calculations
+
+### Load Balancer Sizing
+```
+Target: 10,000 RPS
+Request: 10 KB, Response: 50 KB
+
+Bandwidth:
+- Input: 100 MB/s = 800 Mbps
+- Output: 500 MB/s = 4 Gbps
+- Need 10 Gbps link
+
+Layer 4: 1 instance (handles 10M RPS)
+Layer 7: 1 instance (handles 50K RPS)
+HA: 2x instances
+```
+
+### Backend Pool
+```
+Request rate: 10,000 RPS
+Server capacity: 500 RPS each
+Minimum: 20 servers
+With 50% buffer: 30 servers
+```
+
+## Common Patterns
+
+**Round Robin with Health Checks**: Simplest pattern. Even distribution, automatic failover.
+
+**Least Connections for Long-Polling**: WebSocket/SSE connections need connection-aware routing.
+
+**Weighted Routing for Canary**: Route 95% to stable, 5% to new version for safe deployment.
+
+**Geographic Routing**: DNS-based routing to nearest datacenter for global applications.
+
+## Anti-Patterns (What NOT to Do)
+
+**Sticky Sessions Without Justification**: Reduces scalability. Externalize state to Redis/database instead.
+
+**Single Load Balancer**: No redundancy creates single point of failure. Always deploy pairs.
+
+**No Health Checks**: Basic ping doesn't verify application health. Use HTTP endpoint checks.
+
+**Ignoring Load Balancer Limits**: Connection tables have limits. Monitor before hitting them.
+
+**Over-Complex Routing Logic**: Keep routing simple. Complex logic belongs in application code.
+
+## Interview Tips
+
+**Explain Purpose**: Load balancing enables horizontal scaling and high availability.
+
+**Discuss Algorithm Trade-offs**: "Round Robin for similar servers, Least Connections for varying durations."
+
+**Address High Availability**: "Deploy pair of load balancers with keepalived for failover."
+
+**Layer 4 vs Layer 7**: "Layer 7 for path-based routing to microservices. Layer 4 for high throughput."
+
+**Calculate Numbers**: "For 10K RPS with 100 RPS per server, need 100 servers plus redundancy."
+
+**Real-World Examples**: Reference Netflix, Amazon load balancing at massive scale.
+
+## See It In Action
+
+Complete the load balancing design challenges: **[Load Balancing Challenges](./challenges.md)**
+
+## Additional Resources
+
+**Documentation**:
+- [Nginx Load Balancing](https://docs.nginx.com/nginx/admin-guide/load-balancer/)
+- [HAProxy Configuration](http://www.haproxy.org/)
+- [AWS Elastic Load Balancing](https://docs.aws.amazon.com/elasticloadbalancing/)
+
+**Articles**:
+- [Google SRE Book - Load Balancing at Frontend](https://sre.google/sre-book/load-balancing-frontend/)
+- [Introduction to Modern Network Load Balancing](https://blog.envoyproxy.io/introduction-to-modern-network-load-balancing-and-proxying-a57f6ff80236)
+
+**Tools**:
+- Nginx, HAProxy, Envoy: Load balancers
+- AWS ALB/NLB: Managed cloud load balancing
+- k6, Apache Bench: Load testing tools

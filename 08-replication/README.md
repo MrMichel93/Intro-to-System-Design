@@ -371,3 +371,20 @@ Result: "ab" or "ba" (depends on transform rules)
 ## Next Steps
 
 Continue to **[Consistency Patterns](../09-consistency-patterns/)** to learn about different consistency guarantees in replicated systems!
+
+## Interview Tips
+
+**Explain Replication Purpose**: "Creates copies of data for availability, performance, and disaster recovery."
+
+**Discuss Replication Types**: "Leader-follower for read scaling. Multi-leader for write scaling across regions. Leaderless for high availability."
+
+**Sync vs Async Trade-off**: "Synchronous guarantees no data loss but slower. Asynchronous is fast but may lose data on failure."
+
+**Handle Replication Lag**: "Read-your-writes consistency: read user's own writes from leader. Monotonic reads: stick user to one replica."
+
+**Real Examples**: "Instagram uses leader-follower PostgreSQL with async replication. Netflix uses multi-region Cassandra."
+
+**Calculate Lag Impact**: "With 5-second lag and 1000 writes/second, up to 5000 operations could be out of sync."
+
+**Conflict Resolution**: "Last-write-wins for simplicity. Version vectors for no data loss. Application-level for user control."
+

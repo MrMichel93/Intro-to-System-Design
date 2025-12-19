@@ -492,3 +492,84 @@ If second UPDATE fails, first UPDATE is rolled back automatically.
 ## Next Steps
 
 Master these concepts with the challenges, then explore **[API Design](../05-api-design/)** to learn how applications communicate!
+
+## Implementation Approaches
+
+### Approach 1: Relational Database (SQL)
+- **Description**: Structured data with predefined schemas, ACID guarantees, SQL queries.
+- **Pros**: Strong consistency, mature tooling, complex queries, joins, transactions, data integrity.
+- **Cons**: Harder to scale horizontally, rigid schema, can be slower for simple key-value ops.
+- **When to use**: Financial systems, complex relationships, need transactions, structured data, reporting needs.
+
+### Approach 2: NoSQL Document Store (MongoDB, Couch DB)
+- **Description**: Store data as flexible JSON-like documents.
+- **Pros**: Flexible schema, easy to scale horizontally, fast for document retrieval, good for hierarchical data.
+- **Cons**: No joins, eventual consistency, less mature, complex queries difficult.
+- **When to use**: Content management, user profiles, product catalogs, rapid development, flexible data models.
+
+### Approach 3: NoSQL Key-Value Store (Redis, DynamoDB)
+- **Description**: Simple key-value pairs, optimized for fast reads/writes.
+- **Pros**: Extremely fast, simple model, easy to scale, good for caching, session storage.
+- **Cons**: Limited query capabilities, no complex data relationships, not for complex data models.
+- **When to use**: Caching, session storage, real-time analytics, simple data models, high throughput needs.
+
+### Approach 4: Polyglot Persistence
+- **Description**: Use multiple database types for different needs within same application.
+- **Pros**: Optimal database for each use case, flexibility, performance optimization.
+- **Cons**: Operational complexity, data consistency challenges, more moving parts, higher costs.
+- **When to use**: Large applications, diverse data needs, microservices, mature teams.
+
+## Trade-offs
+
+| Aspect | SQL | NoSQL |
+|--------|-----|-------|
+| Schema | Rigid, predefined | Flexible, schema-less |
+| Scalability | Vertical (mainly) | Horizontal |
+| Consistency | Strong (ACID) | Eventual (BASE) |
+| Joins | Native support | No joins |
+| Transactions | Full ACID | Limited |
+| Query Language | SQL (standard) | Custom APIs |
+| Use Case | Complex relations | Simple access patterns |
+
+## Capacity Calculations
+
+### Database Sizing Example
+```
+Users: 10,000,000
+User data: 2 KB per user
+Total: 20 GB
+
+Orders: 50,000,000
+Order data: 1 KB per order
+Total: 50 GB
+
+Products: 100,000
+Product data: 10 KB per product
+Total: 1 GB
+
+Database size: 71 GB
+With indexes (2x): 142 GB
+With replication (3x): 426 GB
+Growth buffer (30%): 550 GB
+```
+
+## Anti-Patterns
+
+**No Indexes**: Slow queries scanning entire tables. Always index foreign keys and frequently queried columns.
+
+**SELECT ***: Retrieving unnecessary columns wastes bandwidth. Specify needed columns explicitly.
+
+**N+1 Queries**: Loading parent then querying for each child. Use joins or eager loading.
+
+**No Connection Pooling**: Creating new connection per request is expensive. Reuse connections.
+
+## Interview Tips
+
+**SQL vs NoSQL**: Explain use cases for each. "SQL for complex transactions, NoSQL for scale and flexibility."
+
+**Normalization**: "Reduce redundancy through normalization. Denormalize for read performance when needed."
+
+**Indexing Strategy**: "Index frequently queried columns. Balance read speed vs write overhead."
+
+**Scaling Approaches**: "Read replicas for read-heavy. Sharding for write-heavy. Caching to reduce database load."
+

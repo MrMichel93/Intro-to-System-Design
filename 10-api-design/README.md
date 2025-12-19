@@ -652,3 +652,53 @@ POST /api/repos/myusername/myrepo/issues
 ## Next Steps
 
 Practice API design with the challenges, then learn about **[Microservices](../06-microservices/)** to see how to build large systems from small, independent APIs!
+
+## Implementation Approaches
+
+### Approach 1: REST API
+- **Description**: Resource-based URLs, standard HTTP methods, stateless.
+- **Pros**: Simple, well-understood, cacheable, language-agnostic, tooling abundant.
+- **Cons**: Over-fetching/under-fetching, multiple roundtrips, no real-time.
+- **When to use**: Most web APIs, CRUD operations, public APIs, standard requirements.
+
+### Approach 2: GraphQL
+- **Description**: Query language allowing clients to request exact data needed.
+- **Pros**: No over/under-fetching, single endpoint, strong typing, real-time with subscriptions.
+- **Cons**: Complexity, caching harder, potential for expensive queries.
+- **When to use**: Multiple clients with different needs, mobile apps, rapid iteration.
+
+### Approach 3: gRPC
+- **Description**: High-performance RPC framework using Protocol Buffers.
+- **Pros**: Fast (binary), strongly typed, bi-directional streaming, code generation.
+- **Cons**: Not browser-friendly, less human-readable, steeper learning curve.
+- **When to use**: Microservices communication, real-time, performance-critical, internal APIs.
+
+### Approach 4: WebSocket
+- **Description**: Persistent bidirectional connection for real-time communication.
+- **Pros**: True real-time, low latency, bidirectional, efficient.
+- **Cons**: Stateful connections, harder to scale, more complex.
+- **When to use**: Chat, live updates, gaming, real-time dashboards.
+
+## Trade-offs
+
+| Aspect | REST | GraphQL | gRPC |
+|--------|------|---------|------|
+| Performance | Moderate | Moderate | High |
+| Flexibility | Low | High | Low |
+| Learning Curve | Low | Moderate | High |
+| Caching | Easy | Hard | Hard |
+| Real-time | No | Yes (subscriptions) | Yes (streaming) |
+| Browser Support | Full | Full | Limited |
+
+## Interview Tips
+
+**REST Principles**: "Stateless, resource-based, standard methods (GET, POST, PUT, DELETE), cacheable."
+
+**Versioning**: "URL versioning (/v1/users) is common. Header versioning more elegant but less discoverable."
+
+**Rate Limiting**: "Prevent abuse. 1000 requests/hour for free tier. Return 429 status with Retry-After header."
+
+**Error Handling**: "Use standard HTTP codes. Include error details in response body. Provide correlation IDs."
+
+**Pagination**: "Cursor-based for consistency. Offset-based for simplicity. Return total count when needed."
+

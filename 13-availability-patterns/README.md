@@ -547,3 +547,120 @@ Two servers (99% each):
 ## Next Steps
 
 Continue to **[CDN](../14-cdn/)** to learn how content delivery networks improve both availability and performance globally!
+
+## Implementation Approaches
+
+### Approach 1: Active-Passive Failover
+- **Description**: Primary server handles traffic, backup waits. Switches on failure.
+- **Pros**: Simple, lower cost (backup idle), data consistency easier.
+- **Cons**: Wasted backup capacity, failover takes time, backup may be stale.
+- **When to use**: Cost-sensitive, acceptable downtime (seconds-minutes), simple setup needs.
+
+### Approach 2: Active-Active
+- **Description**: All servers handle traffic simultaneously. No idle backup.
+- **Pros**: Better resource utilization, instant failover, load distribution.
+- **Cons**: More complex, data consistency challenges, higher cost.
+- **When to use**: Zero downtime required, high traffic, cost less concern.
+
+### Approach 3: Multi-Region Deployment
+- **Description**: Deploy to multiple geographic regions for disaster recovery.
+- **Pros**: Survives regional outages, lower latency globally, regulatory compliance.
+- **Cons**: Very expensive, complex data sync, higher latency for consistency.
+- **When to use**: Critical services, global users, regulatory requirements.
+
+### Approach 4: Chaos Engineering
+- **Description**: Intentionally inject failures to test resilience.
+- **Pros**: Discovers issues before users, builds confidence, improves systems.
+- **Cons**: Risky if not careful, requires mature processes, cultural shift.
+- **When to use**: Mature systems, Netflix level, production-like testing needed.
+
+## Trade-offs
+
+| Aspect | Active-Passive | Active-Active |
+|--------|----------------|---------------|
+| Cost | Lower (backup idle) | Higher (all resources used) |
+| Failover Time | Seconds-minutes | Instant |
+| Complexity | Simple | Complex |
+| Resource Utilization | 50% | 100% |
+| Consistency | Easier | Harder |
+
+## Capacity Calculations
+
+### Availability Calculation
+```
+System with 3 components:
+- Web server: 99.9% available
+- Database: 99.9% available
+- Cache: 99.5% available
+
+Serial (all must work):
+Total = 99.9% × 99.9% × 99.5% = 99.3%
+Downtime: ~61 hours/year
+
+With redundancy (N+1 for each):
+Web: 1 - (0.001)² = 99.9999%
+DB: 1 - (0.001)² = 99.9999%
+Cache: 1 - (0.005)² = 99.9975%
+
+Total: 99.9974%
+Downtime: ~2.3 hours/year
+```
+
+### SLA Calculation
+```
+99.9% ("three nines"):
+- Downtime/year: 8.76 hours
+- Downtime/month: 43.8 minutes
+- Downtime/week: 10.1 minutes
+
+99.99% ("four nines"):
+- Downtime/year: 52.6 minutes
+- Downtime/month: 4.38 minutes
+- Downtime/week: 1.01 minutes
+
+99.999% ("five nines"):
+- Downtime/year: 5.26 minutes
+- Downtime/month: 26 seconds
+- Downtime/week: 6 seconds
+```
+
+## Common Patterns
+
+**Health Checks**: Continuously monitor service health. Remove unhealthy instances from load balancer.
+
+**Graceful Degradation**: Reduce functionality instead of complete failure. Disable features to keep core working.
+
+**Bulkhead Pattern**: Isolate resources to prevent cascade. Like ship compartments containing damage.
+
+**Timeout and Retry**: Don't wait forever. Retry with exponential backoff. Set reasonable timeouts.
+
+**Rate Limiting**: Protect from overload. Shed load gracefully. Maintain service for some users.
+
+**Circuit Breaker**: Stop calling failed dependencies. Fail fast. Periodically test recovery.
+
+## Anti-Patterns
+
+**No Redundancy**: Single point of failure everywhere. Recipe for outages.
+
+**Untested Failover**: Assuming failover works. Test regularly. Practice disaster recovery.
+
+**No Monitoring**: Can't fix what you don't measure. Monitor everything. Alert proactively.
+
+**Cascading Failures**: One failure triggers others. Use circuit breakers. Isolate failures.
+
+**No Capacity Buffer**: Running at 100% capacity. No room for failures. Keep 30-50% buffer.
+
+## Interview Tips
+
+**Define Availability**: "Percentage of time system is operational. 99.9% = 8.76 hours downtime/year."
+
+**Calculate Availability**: "Components in series multiply. Redundancy increases availability dramatically."
+
+**Failover Strategies**: "Active-passive simpler but wastes resources. Active-active better utilization but complex."
+
+**Disaster Recovery**: "RTO (Recovery Time Objective): how long to recover. RPO (Recovery Point Objective): acceptable data loss."
+
+**Testing**: "Chaos engineering tests resilience. Netflix's Chaos Monkey randomly kills instances."
+
+**Real Examples**: "AWS regions for disaster recovery. Netflix survives entire AWS region failures."
+
