@@ -11,15 +11,43 @@ Additional learning materials, cheat sheets, and references.
 - Capacity planning formulas
 
 ### [Glossary](./glossary.md)
-- System design terminology
-- Common abbreviations
-- Technology definitions
+- 145+ system design terms with definitions
+- Cross-referenced to course modules
+- Organized alphabetically
+- Quick reference by module
+
+### [Numbers to Know](./numbers-to-know.md)
+- Latency numbers for various operations
+- Storage capacities and data sizes
+- Network bandwidth benchmarks
+- QPS (Queries Per Second) benchmarks
+- Cloud cost estimates
+- Availability calculations
+- Practical estimation examples
+
+### [Architecture Patterns](./architecture-patterns.md)
+- 26+ common system design patterns
+- When to use each pattern
+- Trade-offs and considerations
+- Real-world examples
+- Pattern combination strategies
 
 ### [Reading List](./reading-list.md)
-- Recommended books
-- Blog posts
-- Research papers
-- Video tutorials
+- Essential and advanced books
+- Technical papers and research
+- Engineering blogs (Netflix, Uber, etc.)
+- Video series and courses
+- Podcasts and communities
+- Learning path recommendations
+
+### [Tools Guide](./tools-guide.md)
+- Diagramming tools (Excalidraw, draw.io, LucidChart, etc.)
+- Calculation and estimation tools
+- Practice platforms for interviews
+- Database and development tools
+- Monitoring and observability tools
+- Load testing tools
+- Cloud platforms comparison
 
 ## Estimation Cheat Sheet
 
