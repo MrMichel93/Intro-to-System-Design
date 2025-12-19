@@ -528,6 +528,7 @@ Is low latency more important than strong consistency?
 |------------|-----------|---------|----------|
 | **PA/EL** | Available | Fast | Social media, caching, analytics |
 | **PA/EC** | Available | Consistent | E-commerce (some parts) |
+| **PC/EL** | Consistent | Fast | Rare in practice (hard to achieve) |
 | **PC/EC** | Consistent | Consistent | Banking, inventory, bookings |
 
 ### Practical Example: E-Commerce Site

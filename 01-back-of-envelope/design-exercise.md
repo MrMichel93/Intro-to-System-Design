@@ -482,7 +482,7 @@ Better strategy: Cache by recency
 **Technology Stack Suggestions:**
 - **Storage**: Object storage (S3, GCS) with lifecycle policies
 - **CDN**: Global CDN (CloudFront, Akamai, Fastly)
-- **Transcoding**: Distributed transcoding clusters (FFmpeg)
+- **Transcoding**: Distributed transcoding clusters using FFmpeg (with Kubernetes/job queues)
 - **Database**: Distributed SQL for metadata (Spanner, CockroachDB)
 - **Cache**: Redis/Memcached for hot metadata
 - **Analytics**: Data warehouse (BigQuery, Snowflake) for view tracking
