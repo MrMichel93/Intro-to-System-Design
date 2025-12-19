@@ -17,28 +17,84 @@ This course is designed for:
 
 ## 📖 Course Structure
 
-Each topic is organized into its own folder containing:
-- **README.md**: Detailed explanation of the concept with examples
-- **challenges.md**: Practice questions and challenges to test your understanding
+Each module is organized into its own folder containing:
+- **README.md**: Comprehensive explanation of the concept with real-world examples
+- **examples.md**: Detailed real-world examples and case studies
+- **design-exercise.md**: Hands-on design problems to practice
+- **trade-offs.md**: Analysis of design trade-offs and decision-making
+- **diagrams/**: Visual representations and ASCII diagrams
 
-## 🗂️ Topics Covered
+## 🗂️ Course Curriculum
 
-1. **[Scalability](./01-scalability/)** - Learn how systems grow to handle millions of users
-2. **[Load Balancing](./02-load-balancing/)** - Distribute traffic across multiple servers
-3. **[Caching](./03-caching/)** - Speed up applications by storing frequently accessed data
-4. **[Database Design](./04-database-design/)** - Design efficient and scalable databases
-5. **[API Design](./05-api-design/)** - Create clean and maintainable APIs
-6. **[Microservices](./06-microservices/)** - Break down large applications into smaller services
-7. **[Message Queues](./07-message-queues/)** - Enable asynchronous communication between services
-8. **[Content Delivery Networks](./08-cdn/)** - Deliver content faster to users worldwide
+### Foundations (Start Here!)
+
+0. **[System Design Foundations](./00-foundations/)** - What is a system? Requirements gathering, core concepts
+1. **[Back-of-Envelope Calculations](./01-back-of-envelope/)** - Capacity estimation and calculations
+2. **[CAP Theorem](./02-cap-theorem/)** - Consistency, Availability, and Partition Tolerance
+
+### Core Concepts
+
+3. **[Scalability](./03-scalability/)** - Learn how systems grow to handle millions of users
+4. **[Load Balancing](./04-load-balancing/)** - Distribute traffic across multiple servers
+5. **[Caching](./05-caching/)** - Speed up applications by storing frequently accessed data
+6. **[Database Design](./06-database-design/)** - Design efficient and scalable databases
+
+### Advanced Topics
+
+7. **[Data Partitioning](./07-data-partitioning/)** - Sharding strategies and horizontal partitioning
+8. **[Replication](./08-replication/)** - Data replication patterns for reliability
+9. **[Consistency Patterns](./09-consistency-patterns/)** - Strong vs eventual consistency models
+10. **[API Design](./10-api-design/)** - Create clean and maintainable APIs
+11. **[Message Queues](./11-message-queues/)** - Enable asynchronous communication
+12. **[Microservices](./12-microservices/)** - Break down applications into smaller services
+13. **[Availability Patterns](./13-availability-patterns/)** - Failover, redundancy, and high availability
+14. **[CDN](./14-cdn/)** - Content delivery networks for global performance
+
+### Practical Resources
+
+- **[Case Studies](./case-studies/)** - Real-world system design examples (Twitter, Netflix, Uber, etc.)
+- **[Design Templates](./design-templates/)** - Reusable frameworks for common patterns
+- **[Interview Prep](./interview-prep/)** - System design interview guidance and practice
+- **[Resources](./resources/)** - Diagrams, cheat sheets, and additional reading
 
 ## 🚀 How to Use This Repository
 
-1. Start with the first topic and progress sequentially
-2. Read the README in each folder to understand the concept
-3. Complete the challenges to reinforce your learning
-4. Take your time - system design is a broad topic that requires practice
-5. Try to relate concepts to applications you use daily (social media, streaming services, etc.)
+### Recommended Learning Path:
+
+**Week 1-2: Foundations**
+1. Start with **[00-foundations](./00-foundations/)** to understand core concepts
+2. Learn **[01-back-of-envelope](./01-back-of-envelope/)** calculations for capacity planning
+3. Study **[02-cap-theorem](./02-cap-theorem/)** for distributed system trade-offs
+
+**Week 3-4: Core Concepts**
+4. **[03-scalability](./03-scalability/)** - Understanding how systems grow
+5. **[04-load-balancing](./04-load-balancing/)** - Distributing traffic
+6. **[05-caching](./05-caching/)** - Performance optimization
+7. **[06-database-design](./06-database-design/)** - Data modeling
+
+**Week 5-6: Advanced Topics**
+8. **[07-data-partitioning](./07-data-partitioning/)** - Sharding strategies
+9. **[08-replication](./08-replication/)** - Data redundancy
+10. **[09-consistency-patterns](./09-consistency-patterns/)** - Data consistency
+11. **[10-api-design](./10-api-design/)** - Interface design
+
+**Week 7-8: System Architecture**
+12. **[11-message-queues](./11-message-queues/)** - Async communication
+13. **[12-microservices](./12-microservices/)** - Service architecture
+14. **[13-availability-patterns](./13-availability-patterns/)** - High availability
+15. **[14-cdn](./14-cdn/)** - Content delivery
+
+**Practice & Application**
+- Work through **[case-studies](./case-studies/)** to see real systems
+- Use **[design-templates](./design-templates/)** for your own designs
+- Prepare for interviews with **[interview-prep](./interview-prep/)**
+
+### Study Tips:
+- Read the main README in each module first
+- Review real-world examples to understand practical applications
+- Complete design exercises hands-on
+- Analyze trade-offs to develop decision-making skills
+- Take your time - system design requires practice and reflection
 
 ## 💡 Learning Tips
 
@@ -57,4 +113,4 @@ This project is open source and available for educational purposes.
 
 ---
 
-**Ready to start?** Head over to [Scalability](./01-scalability/) to begin your journey into system design!
+**Ready to start?** Begin your journey with [System Design Foundations](./00-foundations/) to build a strong understanding of core concepts!
