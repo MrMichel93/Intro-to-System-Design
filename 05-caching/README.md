@@ -426,7 +426,7 @@ Each layer is progressively slower but has more complete data.
 
 ## Next Steps
 
-Complete the challenges to master caching concepts, then explore **[Database Design](../04-database-design/)** to learn how to structure data efficiently!
+Complete the challenges to master caching concepts, then explore **[Database Design](../06-database-design/)** to learn how to structure data efficiently!
 
 ## Implementation Approaches
 

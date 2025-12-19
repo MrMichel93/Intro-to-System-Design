@@ -651,7 +651,7 @@ POST /api/repos/myusername/myrepo/issues
 
 ## Next Steps
 
-Practice API design with the challenges, then learn about **[Microservices](../06-microservices/)** to see how to build large systems from small, independent APIs!
+Practice API design with the challenges, then learn about **[Microservices](../12-microservices/)** to see how to build large systems from small, independent APIs!
 
 ## Implementation Approaches
 

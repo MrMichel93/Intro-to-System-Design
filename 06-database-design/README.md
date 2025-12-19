@@ -491,7 +491,7 @@ If second UPDATE fails, first UPDATE is rolled back automatically.
 
 ## Next Steps
 
-Master these concepts with the challenges, then explore **[API Design](../05-api-design/)** to learn how applications communicate!
+Master these concepts with the challenges, then explore **[API Design](../10-api-design/)** to learn how applications communicate!
 
 ## Implementation Approaches
 

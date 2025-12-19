@@ -488,7 +488,7 @@ def get_user_recommendations(user_id):
 
 ## Next Steps
 
-Complete the challenges, then learn about **[Message Queues](../07-message-queues/)** - a key technology for microservices communication!
+Complete the challenges, then learn about **[Message Queues](../11-message-queues/)** - a key technology for microservices communication!
 
 ## Implementation Approaches
 

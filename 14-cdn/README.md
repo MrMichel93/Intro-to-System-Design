@@ -428,7 +428,7 @@ Design a global CDN strategy for a media-heavy website serving 10M users across 
 - [Fastly CDN Documentation](https://docs.fastly.com/)
 
 **Articles**:
-- [How CDNs Work - High Scalability](http://highscalability.com/blog/2011/2/28/a-practical-guide-to-varnish-why-varnish-matters.html)
+- [Varnish CDN Implementation Guide](http://highscalability.com/blog/2011/2/28/a-practical-guide-to-varnish-why-varnish-matters.html)
 - [Netflix's CDN - Open Connect](https://openconnect.netflix.com/en/)
 - [Cloudflare: How We Built It](https://blog.cloudflare.com/)
 
